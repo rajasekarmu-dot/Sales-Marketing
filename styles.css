@@ -1,0 +1,78 @@
+/* Custom Styles & Visual Effects for AI Sales & Operations Workflow */
+
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Glassmorphism */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Nav Tab Active States */
+.nav-tab {
+  color: #94a3b8;
+  border: 1px solid transparent;
+}
+
+.nav-tab:hover {
+  color: #f8fafc;
+  background-color: rgba(30, 41, 59, 0.6);
+}
+
+.nav-tab.active {
+  color: #f8fafc;
+  background-color: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Custom Scrollbar for Chat & Telegram */
+#chatMessages::-webkit-scrollbar,
+#telegramFeed::-webkit-scrollbar {
+  width: 6px;
+}
+
+#chatMessages::-webkit-scrollbar-track,
+#telegramFeed::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+#chatMessages::-webkit-scrollbar-thumb,
+#telegramFeed::-webkit-scrollbar-thumb {
+  background: rgba(51, 65, 85, 0.8);
+  border-radius: 3px;
+}
+
+#chatMessages::-webkit-scrollbar-thumb:hover,
+#telegramFeed::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 1);
+}
+
+/* Dynamic PayNow QR Container Styling */
+#qrcodeCanvas img,
+#qrcodeCanvas canvas {
+  margin: 0 auto;
+  width: 110px !important;
+  height: 110px !important;
+  display: block;
+}
+
+/* Pulse animation for active job status */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

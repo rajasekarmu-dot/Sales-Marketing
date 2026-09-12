@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Sales & Operations Workflow | De AI Solutions</title>
+  <meta name="description" content="AI Sales & Operations Workflow System powered by Google Gemini API - Lead Qualification, Quote Drafting, PayNow Invoicing & Job Lifecycle Management">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f4fce3',
+              100: '#e6f7c3',
+              400: '#a3e635',
+              500: '#84cc16',
+              600: '#65a30d',
+              900: '#1a2e05'
+            },
+            telegram: {
+              bg: '#0f172a',
+              card: '#1e293b',
+              accent: '#229ed9'
+            },
+            whatsapp: {
+              bg: '#0b141a',
+              bubbleOut: '#005c4b',
+              bubbleIn: '#202c33'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- QRCode.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="h-full font-['Plus_Jakarta_Sans',sans-serif] bg-slate-950 text-slate-100 antialiased flex flex-col overflow-x-hidden">
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo & Title -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-lime-400 p-0.5 shadow-lg shadow-brand-500/20">
+            <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center font-bold text-brand-400 text-xl">
+              De
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h1 class="font-bold text-lg text-white tracking-tight">AI Sales & Operations Workflow</h1>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20 font-medium">Gemini 1.5/2.0 Powered</span>
+            </div>
+            <p class="text-xs text-slate-400">De AI Solutions Pte Ltd • Subcontractor System Specification</p>
+          </div>
+        </div>
+
+        <!-- System Actions & Gemini API Key Status -->
+        <div class="flex items-center space-x-3">
+          <button id="apiKeyBtn" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-xs font-medium transition text-slate-300">
+            <i data-lucide="key" class="w-4 h-4 text-amber-400"></i>
+            <span id="apiKeyStatusText">Gemini API: Key Set</span>
+            <span id="apiKeyDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          </button>
+
+          <button id="resetDemoBtn" title="Reset Demo Data" class="p-2 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs Bar -->
+  <nav class="border-b border-slate-800 bg-slate-900/40 backdrop-blur-sm sticky top-16 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex space-x-2 py-2.5 overflow-x-auto scrollbar-none">
+        <button data-tab="chat" class="nav-tab active flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
+          <i data-lucide="message-square" class="w-4 h-4"></i>
+          <span>Customer WhatsApp Simulator (REQ-02, REQ-05, REQ-09)</span>
+          <span id="chatBadge" class="hidden bg-emerald-500/20 text-emerald-400 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+        </button>
+
+        <button data-tab="operator" class="nav-tab flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
+          <i data-lucide="send" class="w-4 h-4 text-sky-400"></i>
+          <span>Telegram Operator Hub (REQ-03, REQ-04, REQ-06, REQ-08, REQ-10)</span>
+          <span id="opBadge" class="bg-sky-500/20 text-sky-400 text-xs px-2 py-0.5 rounded-full font-bold">1</span>
+        </button>
+
+        <button data-tab="kanban" class="nav-tab flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
+          <i data-lucide="columns" class="w-4 h-4 text-purple-400"></i>
+          <span>Job Lifecycle Board (REQ-02 — REQ-10)</span>
+        </button>
+
+        <button data-tab="invoices" class="nav-tab flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
+          <i data-lucide="file-text" class="w-4 h-4 text-amber-400"></i>
+          <span>PayNow Invoice & Quote Studio</span>
+        </button>
+
+        <button data-tab="calendar" class="nav-tab flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
+          <i data-lucide="calendar" class="w-4 h-4 text-emerald-400"></i>
+          <span>Google Calendar Schedule (REQ-07)</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Body -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- TAB 1: CUSTOMER WHATSAPP CHAT SIMULATOR -->
+    <div id="tab-chat" class="tab-content space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- WhatsApp Chat Window -->
+        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[700px]">
+          <!-- WhatsApp Header -->
+          <div class="bg-whatsapp-bubbleIn px-4 py-3 border-b border-slate-700/50 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-full bg-emerald-600/30 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold">
+                De
+              </div>
+              <div>
+                <h3 class="font-semibold text-white text-sm flex items-center gap-1.5">
+                  De AI Solutions WhatsApp Bot
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 fill-emerald-500/20"></i>
+                </h3>
+                <p id="botStatusIndicator" class="text-xs text-emerald-400 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  Online • Powered by Gemini AI
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <button id="quickPresetBtn" class="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i> Sample Customer Query
+              </button>
+            </div>
+          </div>
+
+          <!-- Messages Stream -->
+          <div id="chatMessages" class="flex-1 p-4 overflow-y-auto bg-whatsapp-bg space-y-4 font-sans">
+            <!-- Dynamic Messages inserted here -->
+          </div>
+
+          <!-- Chat Input Controls -->
+          <form id="chatForm" class="bg-whatsapp-bubbleIn p-3 border-t border-slate-700/50 flex items-center space-x-2">
+            <input type="text" id="chatInput" placeholder="Type a message to inquire about landscaping/gardening service..." 
+              class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition">
+            <button type="submit" id="sendMsgBtn" class="w-10 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center transition shadow-lg shadow-emerald-600/20">
+              <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+          </form>
+        </div>
+
+        <!-- Qualification & Active Lead Card side panel -->
+        <div class="space-y-6">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <h3 class="text-sm font-semibold text-white uppercase tracking-wider text-slate-400 mb-4 flex items-center justify-between">
+              <span>AI Lead Qualification Extractor</span>
+              <span id="leadStatusBadge" class="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">In Progress</span>
+            </h3>
+
+            <div class="space-y-3.5 text-sm">
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                <p class="text-xs text-slate-400 font-medium">Customer Contact</p>
+                <p id="leadContact" class="font-semibold text-white">Alex Tan (+65 9123 4567)</p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                <p class="text-xs text-slate-400 font-medium">Service Requested</p>
+                <p id="leadService" class="font-semibold text-brand-400">Garden Landscaping & Turf Installation</p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                  <p class="text-xs text-slate-400 font-medium">Property Type</p>
+                  <p id="leadProperty" class="font-medium text-slate-200">Landed Semi-D</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                  <p class="text-xs text-slate-400 font-medium">Location</p>
+                  <p id="leadLocation" class="font-medium text-slate-200">Bukit Timah, SG</p>
+                </div>
+              </div>
+
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                <p class="text-xs text-slate-400 font-medium">Desired Timeline</p>
+                <p id="leadTimeline" class="font-medium text-slate-200">Next 2 Weeks</p>
+              </div>
+
+              <div class="pt-2">
+                <button id="forceQualifyBtn" class="w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20">
+                  <i data-lucide="check-circle" class="w-4 h-4"></i> Send Qualified Lead to Operator (REQ-02)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Workflow Instructions Info Box -->
+          <div class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-5 shadow-xl text-xs text-slate-400 space-y-2">
+            <h4 class="font-semibold text-slate-200 flex items-center gap-1.5">
+              <i data-lucide="info" class="w-4 h-4 text-sky-400"></i> Workflow Stage: REQ-02
+            </h4>
+            <p>Customer interacts with the WhatsApp agent. Gemini automatically extracts key attributes. Once qualified, details are forwarded to Telegram Operator channel.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: OPERATOR TELEGRAM HUB -->
+    <div id="tab-operator" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Telegram Operator Feed -->
+        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[700px]">
+          <!-- Telegram Top Bar -->
+          <div class="bg-telegram-card px-4 py-3 border-b border-slate-700/50 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-full bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-400">
+                <i data-lucide="send" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-semibold text-white text-sm">De AI Operator Approval Bot (@DeAI_OpsBot)</h3>
+                <p class="text-xs text-sky-400">Telegram Channel • Human Checkpoint Hub</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Telegram Message Log -->
+          <div id="telegramFeed" class="flex-1 p-4 overflow-y-auto bg-slate-950 space-y-4">
+            <!-- Telegram feed posts dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Operator Action Control Panel -->
+        <div class="space-y-6">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+            <h3 class="text-sm font-semibold text-white uppercase tracking-wider text-slate-400 flex items-center gap-2">
+              <i data-lucide="sliders" class="w-4 h-4 text-sky-400"></i> Operator Action Control
+            </h3>
+
+            <!-- Stage-specific Quick Triggers -->
+            <div class="space-y-3" id="operatorActionsPanel">
+              <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+                <h4 class="text-xs font-semibold text-sky-400 uppercase tracking-wider">REQ-03 Brief Agent</h4>
+                <p class="text-xs text-slate-400">Instruct Gemini Agent to draft a quote based on customer preference.</p>
+                <div class="space-y-2 pt-1">
+                  <select id="prefChannel" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
+                    <option value="WhatsApp">Customer Preferred Channel: WhatsApp</option>
+                    <option value="Email">Customer Preferred Channel: Email (alex.tan@example.sg)</option>
+                  </select>
+                  <button id="briefAgentBtn" class="w-full py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs transition">
+                    Submit Brief to Agent (REQ-03)
+                  </button>
+                </div>
+              </div>
+
+              <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+                <h4 class="text-xs font-semibold text-amber-400 uppercase tracking-wider">REQ-04 Quote Review & Approval Loop</h4>
+                <p class="text-xs text-slate-400">Review drafted quote, approve or request amendments with revision tracking.</p>
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                  <button id="opApproveQuoteBtn" class="py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition flex items-center justify-center gap-1">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i> Approve Quote
+                  </button>
+                  <button id="opAmendQuoteBtn" class="py-2 rounded-lg bg-amber-600/80 hover:bg-amber-500 text-white font-medium text-xs transition flex items-center justify-center gap-1">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Request Revision
+                  </button>
+                </div>
+              </div>
+
+              <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+                <h4 class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">REQ-06 Deposit Receipt Confirmation</h4>
+                <p class="text-xs text-slate-400">Manual Trust Point: Confirm deposit receipt screenshot from customer.</p>
+                <button id="confirmDepositBtn" class="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition">
+                  Confirm Deposit Received (Open Job)
+                </button>
+              </div>
+
+              <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+                <h4 class="text-xs font-semibold text-purple-400 uppercase tracking-wider">REQ-08 & REQ-10 Job Completion & Closure</h4>
+                <div class="space-y-2">
+                  <button id="markCompletedBtn" class="w-full py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-medium text-xs transition">
+                    Mark Job Completed On-Site (REQ-08)
+                  </button>
+                  <button id="closeJobBtn" class="w-full py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-medium text-xs transition">
+                    Confirm Final Payment & Close Job (REQ-10)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: JOB LIFECYCLE KANBAN BOARD -->
+    <div id="tab-kanban" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-white">Job & Lead Lifecycle Board</h2>
+          <p class="text-xs text-slate-400">Tracks active records across all 10 requirements specified in technical document</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button id="createNewJobBtn" class="px-3 py-2 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold text-xs transition flex items-center gap-1.5">
+            <i data-lucide="plus" class="w-4 h-4"></i> Create Sample Lead
+          </button>
+        </div>
+      </div>
+
+      <!-- Kanban Pipeline Columns -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 overflow-x-auto">
+        <!-- Col 1: Qualification (REQ-02) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col min-h-[500px]">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span> REQ-02 Qualifying
+            </span>
+            <span id="cnt-qualifying" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-mono font-bold">1</span>
+          </div>
+          <div id="col-qualifying" class="space-y-3 flex-1 overflow-y-auto"></div>
+        </div>
+
+        <!-- Col 2: Quote & Review (REQ-03, REQ-04) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col min-h-[500px]">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-sky-400"></span> REQ-04 Quote Review
+            </span>
+            <span id="cnt-quote" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-mono font-bold">0</span>
+          </div>
+          <div id="col-quote" class="space-y-3 flex-1 overflow-y-auto"></div>
+        </div>
+
+        <!-- Col 3: Deposit & Open (REQ-05, REQ-06) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col min-h-[500px]">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> REQ-06 Deposit/Open
+            </span>
+            <span id="cnt-deposit" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-mono font-bold">0</span>
+          </div>
+          <div id="col-deposit" class="space-y-3 flex-1 overflow-y-auto"></div>
+        </div>
+
+        <!-- Col 4: Scheduled & Executing (REQ-07, REQ-08) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col min-h-[500px]">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-purple-400"></span> REQ-07/08 Execution
+            </span>
+            <span id="cnt-execution" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-mono font-bold">0</span>
+          </div>
+          <div id="col-execution" class="space-y-3 flex-1 overflow-y-auto"></div>
+        </div>
+
+        <!-- Col 5: Final Invoice & Closed (REQ-09, REQ-10) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col min-h-[500px]">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-slate-400"></span> REQ-10 Closed
+            </span>
+            <span id="cnt-closed" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-mono font-bold">0</span>
+          </div>
+          <div id="col-closed" class="space-y-3 flex-1 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: PAYNOW INVOICE & QUOTE STUDIO -->
+    <div id="tab-invoices" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Controls & Specs -->
+        <div class="space-y-6">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+            <h3 class="text-sm font-semibold text-white uppercase tracking-wider text-slate-400 flex items-center gap-2">
+              <i data-lucide="qr-code" class="w-4 h-4 text-emerald-400"></i> PayNow QR Configurator
+            </h3>
+            
+            <div class="space-y-3 text-xs">
+              <div>
+                <label class="text-slate-400 block mb-1">Company UEN / Mobile Number</label>
+                <input type="text" id="paynowUen" value="202612345R" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono">
+              </div>
+
+              <div>
+                <label class="text-slate-400 block mb-1">Company Entity Name</label>
+                <input type="text" id="paynowName" value="De AI Solutions Pte Ltd" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white">
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-slate-400 block mb-1">Deposit Rate (%)</label>
+                  <input type="number" id="depositRate" value="30" min="10" max="100" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white font-mono">
+                </div>
+                <div>
+                  <label class="text-slate-400 block mb-1">Currency</label>
+                  <input type="text" value="SGD ($)" disabled class="w-full bg-slate-950/50 border border-slate-800 rounded-lg px-3 py-2 text-slate-500 font-mono">
+                </div>
+              </div>
+
+              <button id="rebuildInvoiceBtn" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition">
+                Update Document & PayNow QR
+              </button>
+            </div>
+          </div>
+
+          <!-- Document Selector -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Select Active Document View</h3>
+            <div class="space-y-2">
+              <button data-doc="quote" class="doc-selector-btn active w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-left transition flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-semibold text-white">Quotations (REQ-04)</p>
+                  <p class="text-xs text-slate-400">Multi-version itemized scope</p>
+                </div>
+                <i data-lucide="file-spreadsheet" class="w-5 h-5 text-sky-400"></i>
+              </button>
+
+              <button data-doc="deposit" class="doc-selector-btn w-full p-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800 text-left transition flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-semibold text-white">Deposit Invoice (REQ-05)</p>
+                  <p class="text-xs text-slate-400">30% Deposit with SG PayNow QR</p>
+                </div>
+                <i data-lucide="qr-code" class="w-5 h-5 text-emerald-400"></i>
+              </button>
+
+              <button data-doc="final" class="doc-selector-btn w-full p-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800 text-left transition flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-semibold text-white">Final Invoice (REQ-09)</p>
+                  <p class="text-xs text-slate-400">Remaining Balance Invoice</p>
+                </div>
+                <i data-lucide="receipt" class="w-5 h-5 text-amber-400"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Document Preview Canvas / Card -->
+        <div class="lg:col-span-2 bg-white text-slate-900 rounded-2xl p-8 shadow-2xl min-h-[700px] flex flex-col justify-between" id="printableDoc">
+          <!-- Document Header -->
+          <div>
+            <div class="flex items-start justify-between border-b pb-6 mb-6">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <div class="w-8 h-8 rounded bg-lime-500 flex items-center justify-center text-slate-950 font-bold text-sm">De</div>
+                  <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">De AI Solutions Pte Ltd</h2>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">10 Marina Boulevard, #39-01 Marina Bay Financial Centre, Singapore</p>
+                <p class="text-xs text-slate-500">UEN: 202612345R • Email: ops@deai.sg</p>
+              </div>
+
+              <div class="text-right">
+                <span id="docTypeTitle" class="inline-block px-3 py-1 bg-slate-900 text-white text-xs font-bold uppercase tracking-wider rounded">OFFICIAL QUOTATION</span>
+                <p id="docNumber" class="text-sm font-mono font-bold text-slate-700 mt-2">DE-2026-0891-V2</p>
+                <p id="docDate" class="text-xs text-slate-500">Date: 10 Sep 2026</p>
+              </div>
+            </div>
+
+            <!-- Client & Job Info -->
+            <div class="grid grid-cols-2 gap-6 p-4 rounded-xl bg-slate-50 border border-slate-200 mb-6 text-xs">
+              <div>
+                <p class="font-bold text-slate-400 uppercase tracking-wider">Prepared For</p>
+                <p id="docClientName" class="font-bold text-slate-900 text-sm mt-0.5">Alex Tan</p>
+                <p id="docClientContact" class="text-slate-600">+65 9123 4567 • alex.tan@example.sg</p>
+                <p id="docClientAddr" class="text-slate-600">Bukit Timah Landed Residence</p>
+              </div>
+              <div>
+                <p class="font-bold text-slate-400 uppercase tracking-wider">Job Specifications</p>
+                <p id="docJobScope" class="font-bold text-slate-900 text-sm mt-0.5">Full Garden Landscaping & Turf Installation</p>
+                <p id="docVersionTag" class="text-slate-600">Audit Status: Approved (Revision v2)</p>
+              </div>
+            </div>
+
+            <!-- Line Items Table -->
+            <table class="w-full text-left text-xs mb-6">
+              <thead>
+                <tr class="border-b-2 border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
+                  <th class="py-2">Item Description</th>
+                  <th class="py-2 text-center">Qty / Area</th>
+                  <th class="py-2 text-right">Unit Rate ($)</th>
+                  <th class="py-2 text-right">Total (SGD)</th>
+                </tr>
+              </thead>
+              <tbody id="docLineItems" class="divide-y divide-slate-100">
+                <!-- Populated via script -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Total Calculation & PayNow QR Section -->
+          <div class="border-t pt-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+              <!-- PayNow QR Box -->
+              <div id="paynowBox" class="p-4 rounded-xl border border-slate-200 bg-emerald-50/50 flex items-center space-x-4">
+                <div id="qrcodeCanvas" class="bg-white p-2 rounded border border-slate-200 shadow-sm"></div>
+                <div>
+                  <div class="flex items-center space-x-1.5">
+                    <span class="font-black text-purple-700 text-sm tracking-tighter">PayNow</span>
+                    <span class="text-[10px] bg-purple-100 text-purple-800 px-1.5 py-0.2 rounded font-semibold">SGQR</span>
+                  </div>
+                  <p class="text-xs font-bold text-slate-900 mt-1">Scan to Pay via Banking App</p>
+                  <p class="text-[11px] text-slate-600">UEN: <span id="displayUen" class="font-mono font-bold">202612345R</span></p>
+                  <p class="text-[11px] text-slate-600">Ref: <span id="displayRef" class="font-mono font-bold">DE-891-DEP</span></p>
+                </div>
+              </div>
+
+              <!-- Price Breakdown -->
+              <div class="space-y-1.5 text-right text-xs">
+                <div class="flex justify-between text-slate-600">
+                  <span>Subtotal:</span>
+                  <span id="docSubtotal" class="font-mono font-semibold">$3,500.00</span>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                  <span>GST (9%):</span>
+                  <span id="docGst" class="font-mono font-semibold">$315.00</span>
+                </div>
+                <div class="flex justify-between text-slate-900 text-sm font-bold pt-2 border-t">
+                  <span>Grand Total:</span>
+                  <span id="docGrandTotal" class="font-mono text-brand-600">$3,815.00</span>
+                </div>
+                <div id="depositDueRow" class="flex justify-between text-emerald-700 text-xs font-extrabold bg-emerald-100/60 p-2 rounded mt-2">
+                  <span>Required 30% Deposit:</span>
+                  <span id="docDepositDue" class="font-mono">$1,144.50</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: GOOGLE CALENDAR SCHEDULE -->
+    <div id="tab-calendar" class="tab-content hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <i data-lucide="calendar" class="w-5 h-5 text-emerald-400"></i> Google Calendar Integration (REQ-07)
+            </h2>
+            <p class="text-xs text-slate-400">Automatically dispatches job appointments to Google Calendar upon deposit confirmation</p>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> Google OAuth Scoped Active
+            </span>
+          </div>
+        </div>
+
+        <!-- Scheduled Jobs Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="calendarEventsList">
+          <!-- Calendar items generated via app.js -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- GEMINI API KEY MODAL -->
+  <div id="apiKeyModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-white text-base flex items-center gap-2">
+          <i data-lucide="key" class="w-5 h-5 text-amber-400"></i> Configure Gemini API Key
+        </h3>
+        <button id="closeApiKeyModal" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <p class="text-xs text-slate-400">Enter your Google Gemini API Key below. This key will be used to power the real-time AI lead qualification and quote drafting engine.</p>
+
+      <div>
+        <label class="text-xs font-semibold text-slate-300 block mb-1">Google Gemini API Key</label>
+        <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white font-mono focus:border-amber-400 focus:outline-none">
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <button id="saveApiKeyBtn" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition">
+          Save Key & Test Connection
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
+</body>
+</html>
